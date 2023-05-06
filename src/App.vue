@@ -3,16 +3,27 @@
   const showModel=ref(false)
   const newNote=ref("")
   const noteList=ref([])
+  const errorMessage=ref("")
 
   const addToNote=()=>{
+    if (newNote.value.length<10){
+      return errorMessage.value="Note's length must be greater than 10"
+    }
     noteList.value.push({
-      id:Math.floor(Math.random*1000000),
+      id:Math.floor(Math.random()*1000000),
       text:newNote.value,
       date:new Date(),
       color:'hsl('+Math.floor(Math.random()*361)+',50%,75%)'
     })
     showModel.value=false
     newNote.value=""
+    errorMessage.value=""
+  }
+
+  const closeNote=()=>{
+    showModel.value=false
+    newNote.value=""
+    errorMessage.value=""
   }
 
 </script>
@@ -21,9 +32,10 @@
   <main>
     <div v-if="showModel" class="overlay">
       <div class="modal">
-        <textarea v-model="newNote" name="text-input" id="text-input" cols="30" rows="10"></textarea>
+        <textarea v-model.trim="newNote" name="text-input" id="text-input" cols="30" rows="10"></textarea>
+        <p>{{ errorMessage }}</p>
         <button @click="addToNote"  class="add-button">Add To Card</button>
-        <button @click="showModel=false" class="close-button">Close</button>
+        <button @click="closeNote" class="close-button">Close</button>
       </div>
     </div>
     
@@ -35,13 +47,12 @@
 
       <div class="card-container">
 
-        <div class="card">
+        <div v-for="note in noteList" class="card" :style="{backgroundColor:note.color}">
           <p class="text-content">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quas illum magni esse sit minima odio!
+            {{note.text}}
           </p>
-          <p class="date">04/11/2023</p>
+          <p class="date">{{ note.date.toLocaleDateString("en-US") }}</p>
         </div>
-
       </div>
     </div>
   </main>
@@ -153,5 +164,9 @@
     background-color: rgb(193,15,15);
     color: white;
     cursor: pointer;
+  }
+
+  .modal p{
+    color:rgb(193,15,15) ;
   }
 </style>
